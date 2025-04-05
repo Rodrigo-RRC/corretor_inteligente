@@ -1,33 +1,64 @@
+# Importa a biblioteca FastAPI para criar a API
 from fastapi import FastAPI, Request
-import time
 
+# Cria a instância do app
 app = FastAPI()
 
+# Dicionário para armazenar os estados da conversa (por número de telefone)
+conversas = {}
+
+# Lista com mensagens-padrão esperadas na entrada do lead (caso ele não apague o texto)
+mensagens_padroes = [
+    "olá! gostaria de receber mais informações do empreendimento.",
+    "quero saber mais sobre o imóvel",
+    "gostaria de mais detalhes"
+]
+
+# Rota principal que recebe mensagens via POST
 @app.post("/mensagem")
 async def receber_mensagem(request: Request):
+    # Captura o corpo da requisição (mensagem enviada pelo lead)
     corpo = await request.json()
-    mensagem = corpo.get("mensagem", "").lower()
+    numero = corpo.get("numero", "")       # Número do lead (simulado)
+    mensagem = corpo.get("mensagem", "").strip().lower()  # Normaliza a mensagem recebida
 
-    print("Mensagem recebida:", mensagem)
+    # Se ainda não existe conversa com esse número, criamos o início do histórico
+    if numero not in conversas:
+        conversas[numero] = {
+            "etapa": "inicio",
+            "dados": {}
+        }
 
-    if "informações" in mensagem or "imóvel" in mensagem:
-        time.sleep(1)
-        return {"resposta": "Oi! Que bom que você se interessou por esse imóvel."}
+    # Verifica a etapa atual da conversa
+    etapa = conversas[numero]["etapa"]
 
-    if "quero saber mais" in mensagem:
-        time.sleep(1.5)
-        return {"resposta": "Esse imóvel tem 2 quartos, fica perto do centro e aceita financiamento."}
+    # Se for o início da conversa
+    if etapa == "inicio":
+        if mensagem not in mensagens_padroes:
+            # O lead escreveu algo diferente do esperado (ex: "quanto é?")
+            conversas[numero]["etapa"] = "apresentacao"
+            return {
+                "resposta": (
+                    "Claro! Esse imóvel tem ótimas condições. "
+                    "Antes de te explicar melhor, posso me apresentar rapidinho?\n\n"
+                    "Sou Alex, assistente virtual do corretor Rodrigo Ribeiro Carvalho. "
+                    "Estou aqui pra te ajudar com todas as informações. Podemos começar?"
+                )
+            }
+        else:
+            # O lead enviou a mensagem padrão esperada
+            conversas[numero]["etapa"] = "apresentacao"
+            return {
+                "resposta": (
+                    "Oi! Sou Alex, assistente virtual do corretor Rodrigo Ribeiro Carvalho. "
+                    "Estou aqui pra te ajudar com as informações e simulações do imóvel. Vamos nessa?\n\n"
+                    "O imóvel fica no bairro Novo Geisel, possui 1 quarto e 1 suíte, "
+                    "vaga de garagem descoberta e área de lazer completa.\n\n"
+                    "Essas características te atendem?"
+                )
+            }
 
-    if "simulação" in mensagem:
-        time.sleep(1.5)
-        return {"resposta": "Para fazermos a simulação, preciso de algumas informações. Vamos começar pela sua idade?"}
-
-    if "30" in mensagem or "anos" in mensagem:
-        time.sleep(1.5)
-        return {"resposta": "Perfeito. E qual é sua renda mensal aproximada?"}
-
-    if "renda" in mensagem or "mil reais" in mensagem:
-        time.sleep(1.5)
-        return {"resposta": "Legal! Com base nessas informações, podemos seguir. Um corretor vai falar com você ainda hoje."}
-
-    return {"resposta": "Desculpe, não entendi bem. Poderia repetir?"}
+    # Se já passou da etapa de apresentação (futuro desenvolvimento)
+    return {
+        "resposta": "Legal! Em breve vou continuar essa conversa. Por enquanto, estamos testando a estrutura inicial 😄"
+    }
