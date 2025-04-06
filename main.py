@@ -1,5 +1,5 @@
- from contexto_mcmv import info_mcmv
- from fastapi import FastAPI
+from contexto_mcmv import info_mcmv
+from fastapi import FastAPI
 from pydantic import BaseModel
 from langchain.llms import HuggingFaceHub
 from langchain.prompts import LLMChain, PromptTemplate
@@ -14,10 +14,7 @@ api_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 app = FastAPI()
 
 # Configura o modelo da Hugging Face
-llm = HuggingFaceHub(
-    repo_id="google/flan-t5-large",
-    model_kwargs={"temperature": 0.7, "max_length": 256}
-)
+llm = HuggingFaceHub(repo_id="google/flan-t5-large", model_kwargs={"temperature": 0.7})
 
 # Prompt base para a IA gerar respostas
 prompt = PromptTemplate(
@@ -44,8 +41,7 @@ class Mensagem(BaseModel):
 
 # Rota para receber mensagens e responder com IA
 @app.post("/mensagem")
-async def responder(mensagem: Mensagem):
-    pergunta = mensagem.texto
-    resposta = chain.run(mensagem=pergunta)
+def responder(pergunta: Entrada):
+    resposta = chain.run(mensagem=pergunta.mensagem)
     return {"resposta": resposta}
 
