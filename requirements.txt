@@ -1,3 +1,6 @@
 fastapi
 uvicorn
-requests
+langchain
+transformers
+python-dotenv
+huggingface_hub
