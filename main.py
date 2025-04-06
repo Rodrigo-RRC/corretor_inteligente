@@ -2,7 +2,8 @@ from contexto_mcmv import info_mcmv
 from fastapi import FastAPI
 from pydantic import BaseModel
 from langchain.llms import HuggingFaceHub
-from langchain.prompts import LLMChain, PromptTemplate
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain
 from dotenv import load_dotenv
 import os
 
@@ -41,7 +42,7 @@ class Mensagem(BaseModel):
 
 # Rota para receber mensagens e responder com IA
 @app.post("/mensagem")
-def responder(pergunta: Entrada):
-    resposta = chain.run(mensagem=pergunta.mensagem)
+def responder(pergunta: Mensagem):
+    resposta = chain.run(mensagem=pergunta.texto)
     return {"resposta": resposta}
 
