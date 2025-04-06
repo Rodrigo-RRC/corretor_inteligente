@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+ from contexto_mcmv import info_mcmv
+ from fastapi import FastAPI
 from pydantic import BaseModel
 from langchain.llms import HuggingFaceHub
-from langchain import LLMChain, PromptTemplate
+from langchain.prompts import LLMChain, PromptTemplate
 from dotenv import load_dotenv
 import os
 
@@ -21,7 +22,17 @@ llm = HuggingFaceHub(
 # Prompt base para a IA gerar respostas
 prompt = PromptTemplate(
     input_variables=["mensagem"],
-    template="Responda de forma clara, educada e objetiva a esta pergunta: {mensagem}"
+    template=f"""
+Você é Alex, assistente virtual do corretor Rodrigo Ribeiro Carvalho.
+
+Com base nas informações abaixo, responda de forma clara, educada e objetiva à pergunta do usuário.
+
+Informações oficiais do programa Minha Casa Minha Vida:
+{info_mcmv}
+
+Pergunta do usuário:
+{{mensagem}}
+"""
 )
 
 # Cria o encadeamento do agente
