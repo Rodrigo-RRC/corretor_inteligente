@@ -1,50 +1,41 @@
-from contexto_mcmv import info_mcmv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
-from langchain.llms import HuggingFaceHub
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-from dotenv import load_dotenv
+import requests
 import os
+from dotenv import load_dotenv
 
-# Carrega variáveis de ambiente (.env)
 load_dotenv()
 
-# Inicializa o app FastAPI
 app = FastAPI()
 
-# Configura o modelo da Hugging Face
-llm = HuggingFaceHub(
-    repo_id="google/flan-t5-large",
-    model_kwargs={"temperature": 0.7}
-)
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+MODEL = "openai/gpt-3.5-turbo"
 
-# Prompt base para a IA gerar respostas
-prompt = PromptTemplate(
-    input_variables=["mensagem"],
-    template=f"""
-Você é Alex, assistente virtual do corretor Rodrigo Ribeiro Carvalho.
-
-Com base nas informações abaixo, responda de forma clara, educada e objetiva à pergunta do usuário.
-
-Informações oficiais do programa Minha Casa Minha Vida:
-{info_mcmv}
-
-Pergunta do usuário:
-{{mensagem}}
-"""
-)
-
-# Cria o encadeamento do agente
-chain = LLMChain(llm=llm, prompt=prompt)
-
-# Define o formato de entrada da API
-class Mensagem(BaseModel):
+class Pergunta(BaseModel):
     mensagem: str
 
-# Rota para receber mensagens e responder com IA
-@app.post("/mensagem")
-def responder(pergunta: Mensagem):
-    resposta = chain.run(mensagem=pergunta.mensagem)
-    return {"resposta": resposta}
+@app.post("/perguntar")
+def perguntar(pergunta: Pergunta):
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/Rodrigo-RRC",  # personalize
+        "X-Title": "Corretor Inteligente",
+    }
 
+    body = {
+        "model": MODEL,
+        "messages": [
+            {"role": "system", "content": "Você é um corretor inteligente e simpático, que responde com empatia, clareza e foco em imóveis populares."},
+            {"role": "user", "content": pergunta.mensagem}
+        ]
+    }
+
+    response = requests.post(OPENROUTER_URL, headers=headers, json=body)
+    resposta = response.json()
+    
+    if "choices" in resposta:
+        return {"resposta": resposta["choices"][0]["message"]["content"]}
+    else:
+        return {"erro": "Erro na resposta da IA", "detalhes": resposta}
