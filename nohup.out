@@ -1,0 +1,18 @@
+INFO:     Started server process [63890]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started server process [63896]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     165.22.248.150:33532 - "GET / HTTP/1.1" 404 Not Found
+INFO:     165.22.248.150:33548 - "GET /login HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     125.132.78.181:55139 - "GET / HTTP/1.0" 404 Not Found
+INFO:     221.158.143.67:39555 - "GET / HTTP/1.0" 404 Not Found
