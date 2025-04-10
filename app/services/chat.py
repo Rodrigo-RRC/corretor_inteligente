@@ -2,31 +2,29 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 from app.core.info_imovel import informacoes_gerais
+from app.core.info_mcmv import info_mcmv
 
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
-# Memória simples
 chat_history = []
 
 def obter_resposta(pergunta):
-    texto = pergunta.lower()
-
-    # 4. Filtros de resposta imediata para casos específicos
-    if "nome sujo" in texto or "negativado" in texto:
-        return "A Caixa não aprova com restrições. Primeiro é necessário regularizar o CPF. Posso te mostrar o caminho pra isso. 😊"
-
-    if "subsídio" in texto or "ajuda do governo" in texto:
-        return "Sim! O governo pode ajudar com subsídio. Vamos simular pra saber o quanto você pode receber."
-
-    # 5. Instruções de estilo e comportamento do assistente
     instrucoes_sistema = (
-        f"Você é um assistente imobiliário direto e simpático. "
-        f"O imóvel está localizado no bairro {informacoes_gerais['bairro']}, próximo a {', '.join(informacoes_gerais['proximidades'])}. "
-        f"Descrição do imóvel: {informacoes_gerais['descricao']}. "
-        f"Nunca diga o nome do imóvel ou rua. Valor só após simulação. "
-        f"Use linguagem leve e clara."
+        f"Você é um assistente imobiliário que responde com simpatia e objetividade.\n"
+        f"Informações do imóvel:\n"
+        f"- Bairro: {informacoes_gerais['bairro']}\n"
+        f"- Proximidades: {', '.join(informacoes_gerais['proximidades'])}\n"
+        f"- Descrição: {informacoes_gerais['descricao']}\n\n"
+        f"Regras:\n"
+        f"- Nunca diga o nome do imóvel ou a rua.\n"
+        f"- Não informe o valor antes da simulação.\n"
+        f"- Caso a pergunta seja sobre o programa Minha Casa Minha Vida, use as seguintes regras:\n"
+        f"  • {info_mcmv['regras']['detalhes'][0]}\n"
+        f"  • {info_mcmv['regras']['detalhes'][1]}\n"
+        f"  • {info_mcmv['regras']['detalhes'][2]}\n"
+        f"- Nunca incentive o cliente a comprar caso ele tenha nome sujo. Apenas diga que ele precisa regularizar antes de prosseguir.\n"
     )
 
     mensagens = [{"role": "system", "content": instrucoes_sistema}]
@@ -39,12 +37,10 @@ def obter_resposta(pergunta):
             messages=mensagens,
             temperature=0.7
         )
-
-        conteudo_resposta = resposta.choices[0].message.content.strip()
+        conteudo = resposta.choices[0].message.content.strip()
         chat_history.append({"role": "user", "content": pergunta})
-        chat_history.append({"role": "assistant", "content": conteudo_resposta})
-        return conteudo_resposta
-
+        chat_history.append({"role": "assistant", "content": conteudo})
+        return conteudo
     except Exception as e:
         return f"Erro ao gerar resposta: {str(e)}"
 
