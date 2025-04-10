@@ -5,4 +5,4 @@ from app.routes.perguntas import router as pergunta_router
 
 app = FastAPI()
 
-app.include_router(pergunta_router, prefix="/")
+app.include_router(pergunta_router, prefix="")
