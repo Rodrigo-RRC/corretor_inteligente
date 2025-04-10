@@ -1,7 +1,7 @@
 # app/main.py
 
 from fastapi import FastAPI
-from app.routes.pergunta import router as pergunta_router
+from app.routes.perguntas import router as pergunta_router
 
 app = FastAPI()
 
