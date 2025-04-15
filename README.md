@@ -118,12 +118,6 @@ uvicorn main:app --host 0.0.0.0 --port 8001
   </a>
 </p>
 
-<p align="center">
-  <a href="https://rodrigo-rrc.github.io/corretor_inteligente/" target="_blank">
-    <img src="https://img.shields.io/badge/⬅️ Voltar para o Projeto CA-gray?style=for-the-badge" alt="Voltar para o Projeto CA"/>
-  </a>
-</p>
-
 ---
 
 ## 👨‍💻 Autor
