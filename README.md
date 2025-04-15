@@ -15,6 +15,13 @@ Este é um agente automatizado desenvolvido com FastAPI, projetado para responde
 - UltraMsg (WhatsApp API)
 - AWS EC2 (hospedagem)
 
+<p align="center">
+  <a href="https://rodrigo-rrc.github.io/Projetos_IA/" target="_blank">
+    <img src="https://img.shields.io/badge/⬅️ Voltar para o índice interativo-blue?style=for-the-badge" alt="Voltar para o índice interativo"/>
+  </a>
+</p>
+
+
 ## Como rodar o projeto localmente:
 
 ```bash
@@ -24,3 +31,5 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --port 8001
+
+
