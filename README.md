@@ -76,8 +76,8 @@ F --> G[Retomada automatizada para agendamento ou encerramento]
 
 - [x] Estrutura da API em FastAPI  
 - [x] Função de simulação de digitação  
-- [x] Coleta de dados via fluxo interativo  
-- [x] Implementação da lógica de pausa + gatilho de retorno  
+- [ ] Coleta de dados via fluxo interativo  
+- [ ] Implementação da lógica de pausa + gatilho de retorno  
 - [ ] Integração com CRM gratuito  
 - [ ] Integração com Google Sheets  
 - [ ] Integração com LLMs para respostas adaptativas
