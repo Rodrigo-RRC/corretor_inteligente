@@ -79,7 +79,6 @@ F --> G[Retomada automatizada para agendamento ou encerramento]
 - [ ] Coleta de dados via fluxo interativo  
 - [ ] Implementação da lógica de pausa + gatilho de retorno  
 - [ ] Integração com CRM gratuito  
-- [ ] Integração com Google Sheets  
 - [ ] Integração com LLMs para respostas adaptativas
 
 ---
