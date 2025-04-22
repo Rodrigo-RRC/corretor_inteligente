@@ -1,11 +1,17 @@
 ---
 title: Corretor Inteligente  
-description: Agente virtual com IA para qualificação de leads no mercado imobiliário via WhatsApp, com foco em automação, triagem e integração futura com CRMs e modelos LLM.  
+description: Agente virtual com IA para qualificação de leads no mercado imobiliário via WhatsApp, com foco em automação, coleta estruturada e integração com CRMs gratuitos e fluxos personalizados.  
 ---
 
 # 🧠 Corretor Inteligente para o Mercado Imobiliário
 
-Este projeto apresenta um **agente inteligente automatizado** para **qualificação de leads no WhatsApp**, voltado para corretores e imobiliárias que desejam automatizar o atendimento inicial, realizar triagem de clientes e otimizar a etapa de simulação de financiamento — antes mesmo do contato humano.
+Este projeto apresenta um **agente inteligente automatizado** para **qualificação de leads no WhatsApp**, voltado para corretores e imobiliárias que desejam otimizar o atendimento inicial por meio de uma jornada em três etapas:
+
+1. **Coleta automatizada de dados essenciais** do lead para análise de financiamento;
+2. **Pausa estratégica para envio da simulação** por parte do corretor humano;
+3. **Retomada automatizada** do atendimento para agendamento de visita (com mensagens de confirmação em múltiplos estágios), ou encerramento cordial da conversa.
+
+Utiliza IA generativa, WhatsApp API e integrações com CRMs gratuitos para manter um fluxo organizado e contínuo com os leads.
 
 ---
 
@@ -14,9 +20,9 @@ Este projeto apresenta um **agente inteligente automatizado** para **qualificaç
 - **Responde de forma humanizada** às mensagens recebidas pelo WhatsApp  
 - **Simula digitação**, trazendo naturalidade ao atendimento  
 - **Coleta dados do lead**: idade, renda, dependentes, estado civil, FGTS, imóvel atual  
-- **Verifica elegibilidade ao Minha Casa Minha Vida**  
-- **Redireciona apenas leads qualificados para o corretor humano**  
-- **Gera base de dados estruturada para CRM ou planilha**  
+- **Gera base de dados estruturada para CRM gratuito ou planilha**  
+- **Encaminha o lead para simulação manual do corretor**  
+- **Retoma o atendimento** com mensagens automáticas para confirmação de visita  
 - **Preparado para integração com LLMs e APIs externas**
 
 ---
@@ -28,22 +34,26 @@ Este projeto apresenta um **agente inteligente automatizado** para **qualificaç
 - **UltraMsg (WhatsApp API)** – envio e recebimento de mensagens  
 - **AWS EC2 (T2.micro)** – hospedagem  
 - **Uvicorn** – servidor ASGI  
+- **CRM Gratuito** – Bitrix24, HubSpot ou equivalente (em implantação)  
 
 ---
 
 ## 🧠 Exemplo de Conversa
 
 ```text
-Bot: Oi! Claro, posso te ajudar com isso.  
-Antes de tudo, preciso saber se conseguimos simular um financiamento pra você. Posso te fazer algumas perguntas rápidas?
+Bot: Olá! Tudo bem? Posso te ajudar com a simulação de financiamento. 😊
+Antes disso, preciso te fazer algumas perguntas rápidas. Vamos lá?
 
-Bot: Legal! Qual sua idade?
+Bot: Qual sua idade?
+Bot: Obrigado! Agora, qual sua renda mensal (individual ou somada)?
+Bot: Perfeito. Você possui pelo menos 3 anos de FGTS?
 
-Bot: Obrigado! Agora me diga sua renda mensal (individual ou somada com alguém)?
+# Após coleta:
+Bot: Ótimo! Agora o corretor vai fazer a simulação com base nesses dados.
+Aguarde que em breve retornaremos! 🙌
 
-Bot: Perfeito. Você possui pelo menos 3 anos de FGTS recolhido?
-
-# ...continua com base no fluxo inteligente até chegar na simulação ou redirecionamento.
+# Retorno manual autorizado:
+Bot: Rodrigo aqui novamente! Podemos agendar uma visita? Confirma esse número como seu WhatsApp?
 ```
 
 ---
@@ -54,9 +64,10 @@ Bot: Perfeito. Você possui pelo menos 3 anos de FGTS recolhido?
 graph TD
 A[Cliente envia mensagem no WhatsApp] --> B[API FastAPI recebe via UltraMsg]
 B --> C[Lógica do Agente em Python]
-C --> D[Verificação das respostas do lead]
-D --> E[Classificação de perfil]
-E --> F[Encaminhamento para corretor ou fim do atendimento]
+C --> D[Coleta de dados estruturada]
+D --> E[Pausa para simulação manual]
+E --> F[Gatilho de retorno ativado no CRM ou planilha]
+F --> G[Retomada automatizada para agendamento ou encerramento]
 ```
 
 ---
@@ -66,10 +77,10 @@ E --> F[Encaminhamento para corretor ou fim do atendimento]
 - [x] Estrutura da API em FastAPI  
 - [x] Função de simulação de digitação  
 - [x] Coleta de dados via fluxo interativo  
-- [x] Primeira versão da lógica de qualificação  
-- [ ] Integração com CRM (em planejamento)  
-- [ ] Geração automática de leads qualificados em planilhas  
-- [ ] Integração com LLMs para respostas adaptativas  
+- [x] Implementação da lógica de pausa + gatilho de retorno  
+- [ ] Integração com CRM gratuito  
+- [ ] Integração com Google Sheets  
+- [ ] Integração com LLMs para respostas adaptativas
 
 ---
 
@@ -80,7 +91,7 @@ E --> F[Encaminhamento para corretor ou fim do atendimento]
 ├── app/
 │   ├── main.py               # FastAPI com rotas ativas
 │   ├── chat.py               # Lógica de diálogo com o lead
-│   ├── regras.py             # Regras do MCMV, simulações, triagens
+│   ├── regras.py             # Regras do MCMV, triagens e condições
 │   └── utils.py              # Funções auxiliares e simulador de digitação
 ```
 
@@ -104,11 +115,10 @@ uvicorn main:app --host 0.0.0.0 --port 8001
 
 ## ⏭️ Próximas Etapas
 
-- Aprimorar o fluxo de conversa com mais ramificações  
-- Criar integração com planilha Google para armazenar os leads  
-- Implementar respostas automáticas por perfil de lead  
-- Conectar com CRM  
-- Integrar com LLM para personalização mais avançada
+- Aprimorar o fluxo com ramificações de perfil  
+- Conectar com planilhas Google e CRM gratuito  
+- Implementar mensagens por tipo de perfil  
+- Integração com LLM para personalização mais avançada
 
 ---
 
