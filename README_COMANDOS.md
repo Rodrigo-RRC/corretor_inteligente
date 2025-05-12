@@ -89,13 +89,6 @@ curl -X POST http://localhost:8000/ \
 nano requirements.txt
 ```
 
----
-
-### 🔹 I) EDITAR O `chat.py` com `nano`
-```bash
-nano app/services/chat.py
-```
-
 #### ➤ Conteúdo sugerido:
 fastapi  
 uvicorn  
@@ -111,7 +104,15 @@ git push origin main
 
 ---
 
-### 🔹 I) EXTRAS ÚTEIS
+### 🔹 I) EDITAR O `chat.py` COM `nano`
+```bash
+nano app/services/chat.py
+```
+
+---
+
+### 🔹 J) EXTRAS ÚTEIS
+
 #### ➤ Verificar status de serviços do Ubuntu:
 ```bash
 sudo pro status
@@ -125,6 +126,21 @@ apt list --upgradable
 #### ➤ Atualizar pacotes com segurança:
 ```bash
 sudo apt update && sudo apt upgrade -y
+```
+
+---
+
+### 🔹 K) SAIR DA INSTÂNCIA E ECONOMIZAR CUSTO NA AWS
+
+#### ✅ Encerrar a sessão corretamente:
+```bash
+deactivate     # Sai do ambiente virtual Python
+exit           # Encerra a sessão SSH do PuTTY
+```
+
+#### ✅ Para desligar a instância (e não gastar enquanto estiver fora):
+```bash
+sudo shutdown now
 ```
 
 ---
