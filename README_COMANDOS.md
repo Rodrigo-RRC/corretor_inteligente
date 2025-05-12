@@ -145,6 +145,42 @@ sudo shutdown now
 
 ---
 
+### 🔹 L) GIT – COMO RESOLVER ERRO DE PUSH (rejected push)
+
+#### ➤ Quando aparecer erro de push (ex: `fetch first`), rode:
+```bash
+git pull origin main --no-rebase
+```
+
+#### ➤ Se abrir o editor `nano` para merge, apenas:
+CTRL + O → ENTER → CTRL + X
+
+#### ➤ Depois finalize com:
+```bash
+git push origin main
+```
+
+---
+
+### 🔹 M) SAIR DO `nano` SEM SALVAR
+Se abrir o `nano` por engano e quiser sair sem alterar nada:
+
+1. Pressione:
+```
+CTRL + X
+```
+
+2. Quando for perguntado:
+```
+Save modified buffer? (ANSWERING "No" WILL DESTROY CHANGES)
+```
+Responda com:
+```
+N
+```
+
+---
+
 📌 **Este é o guia oficial de sobrevivência do projeto Corretor Inteligente.**  
 Atualizado, funcional, definitivo.  
 Rodrigo Ribeiro Carvalho — "Sem pressa. Mas com direção."
