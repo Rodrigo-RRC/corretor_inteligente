@@ -9,117 +9,76 @@ cd ~/corretor_inteligente
 source venv/bin/activate
 ```
 
----
-
 ### 🔹 B) COMANDOS PARA CRIAR OU EDITAR ARQUIVOS
-
-#### ➤ Criar ou editar um arquivo
 ```bash
 nano nome_do_arquivo.py
 ```
 
-#### ➤ Salvar e sair do editor `nano`
-- `CTRL + O` → Salva o arquivo
-- `ENTER` → Confirma o nome
-- `CTRL + X` → Sai do editor
-
----
+#### ➤ Salvar e sair do editor `nano`:
+CTRL + O → Salva o arquivo  
+ENTER → Confirma o nome  
+CTRL + X → Sai do editor
 
 ### 🔹 C) ENVIAR ARQUIVOS PARA O GITHUB (GIT PUSH)
-
-#### ➤ Adicionar um ou mais arquivos ao Git
 ```bash
 git add nome_do_arquivo.py
-```
-
-#### ➤ Fazer o commit com uma mensagem descritiva
-```bash
 git commit -m "Descrição do que foi alterado"
-```
-
-#### ➤ Enviar para o repositório remoto (GitHub)
-```bash
 git push origin main
 ```
 
----
-
-### 🔹 D) ATUALIZAR O SERVIDOR COM CÓDIGOS DO GITHUB (GIT PULL)
-
-#### ➤ Puxar alterações feitas diretamente no GitHub
+### 🔹 D) ATUALIZAR O CÓDIGO COM ALTERAÇÕES DO GITHUB (GIT PULL)
 ```bash
 git pull origin main
 ```
 
----
-
 ### 🔹 E) RODAR O SERVIDOR FASTAPI COM UVICORN
-
-#### ➤ Rodar o agente na porta 8000
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
+uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-#### ➤ (Opcional) Rodar dentro de uma `screen` chamada "corretor"
+#### ➤ (Opcional) Rodar o servidor dentro de uma `screen` chamada "corretor":
 ```bash
 screen -S corretor
-uvicorn main:app --host 0.0.0.0 --port 8000
+uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-#### ➤ Sair da screen sem parar o servidor
-- `CTRL + A`, depois `D`
+#### ➤ Sair da screen sem encerrar o servidor:
+CTRL + A, depois D
 
-#### ➤ Voltar para a screen depois
+#### ➤ Voltar para a screen:
 ```bash
 screen -r corretor
 ```
 
----
-
 ### 🔹 F) TESTAR SUA API COM `curl`
-
-#### ➤ Enviar uma mensagem simulada
 ```bash
-curl -X POST http://localhost:8000/mensagem \
+curl -X POST http://localhost:8000/ \
   -H "Content-Type: application/json" \
-  -d '{"texto": "Qual o valor do imóvel?"}'
+  -d '{"mensagem": "Qual o valor do imóvel?"}'
 ```
 
----
-
-### 🔹 G) CRIAR O requirements.txt MANUALMENTE
-
-#### ➤ Criar e editar o arquivo
+### 🔹 G) CRIAR O `requirements.txt` MANUALMENTE
 ```bash
 nano requirements.txt
 ```
 
 #### ➤ Conteúdo sugerido:
-```
-fastapi
-uvicorn
-langchain
-transformers
-python-dotenv
-huggingface_hub
-```
+fastapi  
+uvicorn  
+python-dotenv  
+requests
 
-#### ➤ Salvar e subir para o GitHub
+#### ➤ Salvar e enviar para o GitHub:
 ```bash
 git add requirements.txt
 git commit -m "Adiciona requirements.txt com dependências"
 git push origin main
 ```
 
----
+### 🔹 H) SOBRE O `curl`
+Ferramenta de linha de comando para testar requisições HTTP.  
+Útil para testar rapidamente se o bot está respondendo corretamente.  
+Permite simular leads enviando mensagens à API do agente inteligente sem interface externa.
 
-### 🔹 H) IMPORTANTE – SOBRE O `curl`
-- Ferramenta de terminal para fazer requisições HTTP
-- Serve para testar sua API **sem precisar de navegador ou WhatsApp**
-- Simula um lead enviando uma pergunta diretamente para seu agente inteligente
-
----
-
-📌 Tudo isso está ajustado para o projeto rodar direto na AWS, com integração ao GitHub e estrutura profissional.
-
+📌 Esses comandos são o kit de sobrevivência do seu projeto Corretor Inteligente.  
 Rodrigo Ribeiro Carvalho — "Sem pressa. Mas com direção."
