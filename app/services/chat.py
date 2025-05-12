@@ -14,7 +14,7 @@ chat_history = []
 
 def obter_resposta(pergunta):
     # Instruções iniciais para orientar o comportamento da IA
-        instrucoes_sistema = f"""Você é Bruna, uma agente virtual inteligente especializada em imóveis do programa Minha Casa Minha Vida. 
+    instrucoes_sistema = f"""Você é Bruna, uma agente virtual inteligente especializada em imóveis do programa Minha Casa Minha Vida. 
 Seu papel é coletar apenas as informações necessárias para uma simulação de financiamento, sem parecer robô, sendo cordial, objetiva e adaptável conforme o contexto da conversa.
 
 REGRAS DE CONDUTA:
