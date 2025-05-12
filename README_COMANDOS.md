@@ -1,8 +1,8 @@
 # 📘 README_COMANDOS.md
 
-## ✅ COMANDOS BÁSICOS – PROJETO CORRETOR INTELIGENTE
+## ✅ COMANDOS COMPLETOS – PROJETO CORRETOR INTELIGENTE (ATUALIZADO E DEFINITIVO)
 
-### 🔹 A) ACESSAR A INSTÂNCIA E A PASTA DO PROJETO
+### 🔹 A) ACESSAR A INSTÂNCIA EC2 E ATIVAR O PROJETO
 ```bash
 ssh -i SEU_ARQUIVO.pem ubuntu@SEU_IP_PUBLICO
 cd ~/corretor_inteligente
@@ -11,115 +11,124 @@ source venv/bin/activate
 
 ---
 
-### 🔹 B) COMANDOS PARA CRIAR OU EDITAR ARQUIVOS
+### 🔹 B) ATUALIZAR O SISTEMA OPERACIONAL (APT UPDATE/UPGRADE)
+```bash
+sudo apt update
+sudo apt upgrade -y
+```
 
-#### ➤ Criar ou editar um arquivo
+#### ➤ Após atualização completa:
+```bash
+sudo reboot
+```
+
+#### ➤ Verificar versão do kernel:
+```bash
+uname -r
+```
+
+---
+
+### 🔹 C) COMANDOS PARA CRIAR OU EDITAR ARQUIVOS
 ```bash
 nano nome_do_arquivo.py
 ```
 
-#### ➤ Salvar e sair do editor `nano`
-- `CTRL + O` → Salva o arquivo
-- `ENTER` → Confirma o nome
-- `CTRL + X` → Sai do editor
+#### ➤ Atalhos no `nano`:
+CTRL + O → Salva o arquivo  
+ENTER → Confirma o nome  
+CTRL + X → Sai do editor  
 
 ---
 
-### 🔹 C) ENVIAR ARQUIVOS PARA O GITHUB (GIT PUSH)
-
-#### ➤ Adicionar um ou mais arquivos ao Git
+### 🔹 D) USO DO GIT – COMANDOS ESSENCIAIS
 ```bash
+git status
 git add nome_do_arquivo.py
-```
-
-#### ➤ Fazer o commit com uma mensagem descritiva
-```bash
-git commit -m "Descrição do que foi alterado"
-```
-
-#### ➤ Enviar para o repositório remoto (GitHub)
-```bash
+git commit -m "Descrição clara da alteração"
 git push origin main
-```
-
----
-
-### 🔹 D) ATUALIZAR O SERVIDOR COM CÓDIGOS DO GITHUB (GIT PULL)
-
-#### ➤ Puxar alterações feitas diretamente no GitHub
-```bash
 git pull origin main
 ```
 
 ---
 
-### 🔹 E) RODAR O SERVIDOR FASTAPI COM UVICORN
-
-#### ➤ Rodar o agente na porta 8000
+### 🔹 E) RODAR A APLICAÇÃO COM UVICORN
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
+uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-#### ➤ (Opcional) Rodar dentro de uma `screen` chamada "corretor"
+---
+
+### 🔹 F) USAR SCREEN PARA RODAR EM SEGUNDO PLANO
 ```bash
 screen -S corretor
-uvicorn main:app --host 0.0.0.0 --port 8000
+uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-#### ➤ Sair da screen sem parar o servidor
-- `CTRL + A`, depois `D`
+#### ➤ Sair da screen sem parar o servidor:
+CTRL + A, depois D
 
-#### ➤ Voltar para a screen depois
+#### ➤ Voltar para a screen:
 ```bash
 screen -r corretor
 ```
 
 ---
 
-### 🔹 F) TESTAR SUA API COM `curl`
-
-#### ➤ Enviar uma mensagem simulada
+### 🔹 G) TESTAR SUA API COM `curl`
 ```bash
-curl -X POST http://localhost:8000/mensagem \
+curl -X POST http://localhost:8000/ \
   -H "Content-Type: application/json" \
-  -d '{"texto": "Qual o valor do imóvel?"}'
+  -d '{"mensagem": "Qual o valor do imóvel?"}'
 ```
 
 ---
 
-### 🔹 G) CRIAR O requirements.txt MANUALMENTE
-
-#### ➤ Criar e editar o arquivo
+### 🔹 H) CRIAR E MANTER O `requirements.txt`
 ```bash
 nano requirements.txt
 ```
 
-#### ➤ Conteúdo sugerido:
-```
-fastapi
-uvicorn
-langchain
-transformers
-python-dotenv
-huggingface_hub
+---
+
+### 🔹 I) EDITAR O `chat.py` com `nano`
+```bash
+nano app/services/chat.py
 ```
 
-#### ➤ Salvar e subir para o GitHub
+#### ➤ Conteúdo sugerido:
+fastapi  
+uvicorn  
+python-dotenv  
+requests  
+
+#### ➤ Versionar no Git:
 ```bash
 git add requirements.txt
-git commit -m "Adiciona requirements.txt com dependências"
+git commit -m "Atualiza dependências do projeto"
 git push origin main
 ```
 
 ---
 
-### 🔹 H) IMPORTANTE – SOBRE O `curl`
-- Ferramenta de terminal para fazer requisições HTTP
-- Serve para testar sua API **sem precisar de navegador ou WhatsApp**
-- Simula um lead enviando uma pergunta diretamente para seu agente inteligente
+### 🔹 I) EXTRAS ÚTEIS
+#### ➤ Verificar status de serviços do Ubuntu:
+```bash
+sudo pro status
+```
+
+#### ➤ Ver pacotes que podem ser atualizados:
+```bash
+apt list --upgradable
+```
+
+#### ➤ Atualizar pacotes com segurança:
+```bash
+sudo apt update && sudo apt upgrade -y
+```
 
 ---
 
-📌 Tudo isso está ajustado para o projeto rodar direto na AWS, com integração ao GitHub e estrutura profissional.
-
+📌 **Este é o guia oficial de sobrevivência do projeto Corretor Inteligente.**  
+Atualizado, funcional, definitivo.  
 Rodrigo Ribeiro Carvalho — "Sem pressa. Mas com direção."
