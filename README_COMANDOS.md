@@ -1,48 +1,71 @@
 # 📘 README_COMANDOS.md
 
-## ✅ COMANDOS BÁSICOS – PROJETO CORRETOR INTELIGENTE
+## ✅ COMANDOS COMPLETOS – PROJETO CORRETOR INTELIGENTE (ATUALIZADO E DEFINITIVO)
 
-### 🔹 A) ACESSAR A INSTÂNCIA E A PASTA DO PROJETO
+### 🔹 A) ACESSAR A INSTÂNCIA EC2 E ATIVAR O PROJETO
 ```bash
 ssh -i SEU_ARQUIVO.pem ubuntu@SEU_IP_PUBLICO
 cd ~/corretor_inteligente
 source venv/bin/activate
 ```
 
-### 🔹 B) COMANDOS PARA CRIAR OU EDITAR ARQUIVOS
+---
+
+### 🔹 B) ATUALIZAR O SISTEMA OPERACIONAL (APT UPDATE/UPGRADE)
+```bash
+sudo apt update
+sudo apt upgrade -y
+```
+
+#### ➤ Após atualização completa:
+```bash
+sudo reboot
+```
+
+#### ➤ Verificar versão do kernel:
+```bash
+uname -r
+```
+
+---
+
+### 🔹 C) COMANDOS PARA CRIAR OU EDITAR ARQUIVOS
 ```bash
 nano nome_do_arquivo.py
 ```
 
-#### ➤ Salvar e sair do editor `nano`:
+#### ➤ Atalhos no `nano`:
 CTRL + O → Salva o arquivo  
 ENTER → Confirma o nome  
-CTRL + X → Sai do editor
+CTRL + X → Sai do editor  
 
-### 🔹 C) ENVIAR ARQUIVOS PARA O GITHUB (GIT PUSH)
+---
+
+### 🔹 D) USO DO GIT – COMANDOS ESSENCIAIS
 ```bash
+git status
 git add nome_do_arquivo.py
-git commit -m "Descrição do que foi alterado"
+git commit -m "Descrição clara da alteração"
 git push origin main
-```
-
-### 🔹 D) ATUALIZAR O CÓDIGO COM ALTERAÇÕES DO GITHUB (GIT PULL)
-```bash
 git pull origin main
 ```
 
-### 🔹 E) RODAR O SERVIDOR FASTAPI COM UVICORN
+---
+
+### 🔹 E) RODAR A APLICAÇÃO COM UVICORN
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-#### ➤ (Opcional) Rodar o servidor dentro de uma `screen` chamada "corretor":
+---
+
+### 🔹 F) USAR SCREEN PARA RODAR EM SEGUNDO PLANO
 ```bash
 screen -S corretor
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-#### ➤ Sair da screen sem encerrar o servidor:
+#### ➤ Sair da screen sem parar o servidor:
 CTRL + A, depois D
 
 #### ➤ Voltar para a screen:
@@ -50,14 +73,18 @@ CTRL + A, depois D
 screen -r corretor
 ```
 
-### 🔹 F) TESTAR SUA API COM `curl`
+---
+
+### 🔹 G) TESTAR SUA API COM `curl`
 ```bash
 curl -X POST http://localhost:8000/ \
   -H "Content-Type: application/json" \
   -d '{"mensagem": "Qual o valor do imóvel?"}'
 ```
 
-### 🔹 G) CRIAR O `requirements.txt` MANUALMENTE
+---
+
+### 🔹 H) CRIAR E MANTER O `requirements.txt`
 ```bash
 nano requirements.txt
 ```
@@ -66,19 +93,35 @@ nano requirements.txt
 fastapi  
 uvicorn  
 python-dotenv  
-requests
+requests  
 
-#### ➤ Salvar e enviar para o GitHub:
+#### ➤ Versionar no Git:
 ```bash
 git add requirements.txt
-git commit -m "Adiciona requirements.txt com dependências"
+git commit -m "Atualiza dependências do projeto"
 git push origin main
 ```
 
-### 🔹 H) SOBRE O `curl`
-Ferramenta de linha de comando para testar requisições HTTP.  
-Útil para testar rapidamente se o bot está respondendo corretamente.  
-Permite simular leads enviando mensagens à API do agente inteligente sem interface externa.
+---
 
-📌 Esses comandos são o kit de sobrevivência do seu projeto Corretor Inteligente.  
+### 🔹 I) EXTRAS ÚTEIS
+#### ➤ Verificar status de serviços do Ubuntu:
+```bash
+sudo pro status
+```
+
+#### ➤ Ver pacotes que podem ser atualizados:
+```bash
+apt list --upgradable
+```
+
+#### ➤ Atualizar pacotes com segurança:
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+---
+
+📌 **Este é o guia oficial de sobrevivência do projeto Corretor Inteligente.**  
+Atualizado, funcional, definitivo.  
 Rodrigo Ribeiro Carvalho — "Sem pressa. Mas com direção."
