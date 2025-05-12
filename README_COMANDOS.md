@@ -89,6 +89,8 @@ curl -X POST http://localhost:8000/ \
 nano requirements.txt
 ```
 
+---
+
 ### 🔹 I) EDITAR O `chat.py` com `nano`
 ```bash
 nano app/services/chat.py
