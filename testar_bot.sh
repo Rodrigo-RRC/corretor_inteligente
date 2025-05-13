@@ -6,20 +6,20 @@ echo "==== TESTE DE CONVERSA COM A BRUNA ===="
 echo -e "\n[LEAD] Oi"
 sleep 1
 
-# Abertura da Bruna
+# Abertura da Bruna com opções numeradas
 echo -e "\n[BRUNA] Olá! Sou a Bruna, sua corretora virtual — uma agente inteligente aqui pra te ajudar com imóveis do Minha Casa Minha Vida."
 echo "[BRUNA] Este imóvel fica próximo ao Bairro Geisel, tem 1 suíte + 1 quarto, área de lazer completa, e está saindo a partir de R\$ 178 mil."
 echo "[BRUNA] Posso te ajudar de duas formas:"
-echo "[BRUNA] 1) Ver se o imóvel combina com seu perfil"
-echo "[BRUNA] 2) Agendar uma visita (preciso antes fazer uma pré-análise)"
-echo "[BRUNA] Com o que você gostaria de começar?"
+echo "[BRUNA] 1️⃣ Ver se o imóvel combina com seu perfil"
+echo "[BRUNA] 2️⃣ Agendar uma visita (preciso antes fazer uma pré-análise)"
+echo "[BRUNA] Responda por favor com 1 ou 2 😉"
 sleep 2
 
-# Simulando escolha do lead
-echo -e "\n[LEAD] Quero ver se combina com meu perfil"
+# Simulando resposta do lead
+echo -e "\n[LEAD] 1"
 sleep 1
 
-# Primeira pergunta adaptativa
+# Início da qualificação adaptativa
 echo -e "\n[BRUNA] Você pretende financiar esse imóvel?"
 sleep 1
 echo -e "[LEAD] Sim"
