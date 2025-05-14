@@ -75,7 +75,7 @@ screen -r corretor
 
 ---
 
-### 🔹 G) TESTAR SUA API COM `curl`
+### 🔹 G) TESTAR SUA API COM `curl` (versão simples)
 ```bash
 curl -X POST http://localhost:8000/ \
   -H "Content-Type: application/json" \
@@ -178,6 +178,49 @@ Responda com:
 ```
 N
 ```
+
+---
+
+### 🔹 N) CONTROLE DE ESTADO E TESTES COM `lead_id`
+
+#### ➤ Verificar se o `estado_lead.py` foi salvo corretamente:
+```bash
+ls app/core
+```
+
+#### ➤ Criar ou editar arquivos de lógica do agente:
+```bash
+nano app/core/estado_lead.py
+nano app/services/chat.py
+nano app/routes/perguntas.py
+```
+
+#### ➤ Executar a API FastAPI com caminho correto:
+```bash
+uvicorn app.main:app --reload
+```
+
+#### ➤ Testar com `curl` enviando o `lead_id`:
+```bash
+curl -X POST http://127.0.0.1:8000/ \
+  -H "Content-Type: application/json" \
+  -d '{"mensagem": "Oi", "lead_id": "11999999999"}'
+```
+
+#### ➤ Simular resposta da IA após simulação manual:
+```bash
+curl -X POST http://127.0.0.1:8000/ \
+  -H "Content-Type: application/json" \
+  -d '{"mensagem": "#resposta_simulacao:11999999999:Rodrigo, com base nos seus dados a simulação foi aprovada!", "lead_id": "11999999999"}'
+```
+
+#### ➤ Encerrar o servidor Uvicorn:
+```
+CTRL + C
+```
+
+📌 Esses comandos são fundamentais para manter o controle por lead, os estados da conversa e a pausa entre coleta e simulação.  
+Atualize este bloco conforme o agente evoluir.
 
 ---
 
