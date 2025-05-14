@@ -1,18 +1,34 @@
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
-from app.core.info_imovel import informacoes_gerais
-from app.core.info_mcmv import info_mcmv
+from app.core.estado_lead import (
+    inicializar_lead, atualizar_estado, obter_estado,
+    adicionar_ao_historico, obter_historico
+)
 
-# Carrega variáveis do arquivo .env
+# Carrega variáveis do .env
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
-# Memória simples para manter o histórico de conversa
-chat_history = []
+def obter_resposta(pergunta, lead_id):
+    if obter_estado(lead_id) is None:
+        inicializar_lead(lead_id)
 
-def obter_resposta(pergunta):
+    estado = obter_estado(lead_id)
+
+    # PAUSA: aguardando comando de simulação
+    if estado == "aguardando_simulacao" and not pergunta.startswith("#resposta_simulacao:"):
+        return "Certo! Assim que a simulação estiver pronta, eu te aviso por aqui mesmo. 😉"
+
+    # COMANDO INTERNO: resposta da simulação
+    if pergunta.startswith("#resposta_simulacao:"):
+        mensagem = pergunta.split(":", 2)[2]
+        atualizar_estado(lead_id, "respondeu_simulacao")
+        adicionar_ao_historico(lead_id, "assistant", mensagem)
+        return mensagem
+
+    # MONTA O PROMPT
     instrucoes_sistema = """
 Você é Bruna, uma agente virtual inteligente especializada em imóveis do programa Minha Casa Minha Vida. Seu papel é coletar apenas as informações necessárias para uma simulação de financiamento, sem parecer robô, sendo cordial, objetiva e adaptável conforme o contexto da conversa.
 
@@ -34,16 +50,14 @@ Posso te ajudar de duas formas:
 2️⃣ Agendar uma visita (preciso antes fazer uma pré-análise)
 
 Responda com 1 ou 2, por favor 😊
-
 """
 
-    # Força a abertura da conversa na primeira interação
-    if len(chat_history) == 0:
+    if estado == "apresentacao":
         pergunta = "Inicie a conversa"
+        atualizar_estado(lead_id, "coletando_dados")
 
-    # Monta o contexto da conversa
     mensagens = [{"role": "system", "content": instrucoes_sistema}]
-    mensagens.extend(chat_history)
+    mensagens.extend(obter_historico(lead_id))
     mensagens.append({"role": "user", "content": pergunta})
 
     try:
@@ -55,9 +69,21 @@ Responda com 1 ou 2, por favor 😊
 
         conteudo = resposta.choices[0].message.content.strip()
 
-        # Atualiza o histórico
-        chat_history.append({"role": "user", "content": pergunta})
-        chat_history.append({"role": "assistant", "content": conteudo})
+        adicionar_ao_historico(lead_id, "user", pergunta)
+        adicionar_ao_historico(lead_id, "assistant", conteudo)
+
+        # GATILHOS que disparam a pausa e mudam para aguardando_simulacao
+        gatilhos_pausa = [
+            "vou preparar uma simulação",
+            "vou calcular os valores e condições",
+            "em seguida te passo as informações",
+            "posso prosseguir com a simulação",
+            "vou calcular"
+        ]
+
+        if any(g in conteudo.lower() for g in gatilhos_pausa):
+            atualizar_estado(lead_id, "aguardando_simulacao")
+            return "Perfeito! Já coletei tudo que preciso.\nVou preparar a simulação com base nesses dados e te aviso por aqui mesmo assim que ela estiver pronta, tudo bem?"
 
         return conteudo
 
