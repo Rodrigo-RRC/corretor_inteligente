@@ -53,8 +53,18 @@ Responda com 1 ou 2, por favor 😊
 """
 
     if estado == "apresentacao":
-        pergunta = "Inicie a conversa"
-        atualizar_estado(lead_id, "coletando_dados")
+       atualizar_estado(lead_id, "coletando_dados")
+       return """Olá! Sou a Bruna, sua corretora virtual — uma agente inteligente aqui pra te ajudar com imóveis do Minha Casa Minha Vida.
+
+    Este imóvel fica próximo ao Bairro Geisel, tem 1 suíte + 1 quarto, área de lazer completa, e está saindo a partir de R$ 178 mil.
+
+    Posso te ajudar de duas formas:
+
+    1️⃣ Ver se o imóvel combina com seu perfil  
+    2️⃣ Agendar uma visita (preciso antes fazer uma pré-análise)
+
+    Responda com 1 ou 2, por favor 😊"""
+
 
     mensagens = [{"role": "system", "content": instrucoes_sistema}]
     mensagens.extend(obter_historico(lead_id))
