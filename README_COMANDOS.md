@@ -10,8 +10,6 @@ source venv/bin/activate
 🔹 B) ATUALIZAR O SISTEMA OPERACIONAL (APT UPDATE/UPGRADE)  
 sudo apt update  
 sudo apt upgrade -y  
-
-➤ Após atualização completa:  
 sudo reboot  
 
 ➤ Verificar versão do kernel:  
@@ -21,9 +19,9 @@ uname -r
 nano nome_do_arquivo.py  
 
 ➤ Atalhos no nano:  
-CTRL + O → Salvar  
-ENTER → Confirmar  
-CTRL + X → Sair  
+CTRL + O → Salva o arquivo  
+ENTER → Confirma o nome  
+CTRL + X → Sai do editor  
 
 🔹 D) USO DO GIT – COMANDOS ESSENCIAIS  
 git status  
@@ -45,10 +43,20 @@ CTRL + A, depois D
 ➤ Voltar para a screen:  
 screen -r corretor  
 
+➤ Encerrar a screen de forma definitiva:  
+1. Reanexe com:  
+   screen -r corretor  
+2. Pare o processo com:  
+   CTRL + C  
+3. Finalize com:  
+   exit  
+
+✅ A screen será encerrada e não ficará mais ativa em background.
+
 🔹 G) TESTAR SUA API COM `curl` (versão simples)  
 curl -X POST http://localhost:8000/ \  
   -H "Content-Type: application/json" \  
-  -d '{"mensagem": "Qual o valor do imóvel?"}'  
+  -d '{"mensagem": "Qual o valor do imóvel?"}'
 
 🔹 H) CRIAR E MANTER O `requirements.txt`  
 nano requirements.txt  
