@@ -15,15 +15,10 @@ api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
 def gerar_resumo_info():
-    # Converte dados dos arquivos em texto
     partes = []
-
-    # Info imóvel
     partes.append(f"Imóvel localizado próximo ao bairro {informacoes_gerais['bairro']}.")
     partes.append(f"Descrição: {informacoes_gerais['descricao']}")
     partes.append("Proximidades: " + ", ".join(informacoes_gerais["proximidades"]))
-
-    # Info MCMV
     partes.append(f"Programa: {info_mcmv['descricao']}")
     partes.append("Público-alvo: " + info_mcmv["publico_alvo"])
     partes.append("Condições de uso do FGTS: " + info_mcmv["uso_fgts"])
@@ -33,7 +28,6 @@ def gerar_resumo_info():
     for faixa, detalhes in info_mcmv["faixas"].items():
         partes.append(f"  - {faixa}: {detalhes}")
     partes.append("Documentação necessária: " + ", ".join(info_mcmv["documentacao_necessaria"]))
-
     return "\n".join(partes)
 
 def obter_resposta(pergunta, lead_id):
@@ -99,7 +93,7 @@ def obter_resposta(pergunta, lead_id):
             return conteudo + "\n\nSe quiser, posso seguir com a simulação. Posso?"
 
     if estado == "esperando_confirmacao_simulacao":
-        if pergunta.strip().lower() in ["sim", "pode", "sim pode", "pode sim"]:
+        if pergunta.strip().lower() in ["sim", "pode", "sim pode", "pode sim", "claro", "sim, pode continuar"]:
             adicionar_ao_historico(lead_id, "user", pergunta)
             atualizar_estado(lead_id, "coletando_dados")
             return f"digitando...\n{perguntas_simulacao[0]}"
@@ -131,7 +125,6 @@ def obter_resposta(pergunta, lead_id):
 
         return f"digitando...\n{pergunta_atual}"
 
-    # Fallback total: modelo responde baseado no contexto e instruções
     instrucoes_sistema = f'''
 Você é Bruna, uma agente virtual inteligente especializada em imóveis do programa Minha Casa Minha Vida. Seu papel é conduzir o atendimento de forma empática e inteligente, entendendo o contexto da conversa.
 
