@@ -38,36 +38,37 @@ def obter_resposta(pergunta, lead_id):
             "1️⃣ É a primeira vez que tenta comprar seu imóvel?\n"
             "2️⃣ Já tentou outras vezes e não conseguiu?\n"
             "3️⃣ Já tem carta aprovada e quer visitar o imóvel?\n\n"
-            "Responda com 1, 2 ou 3, por favor 😊"
+            "Responda com 1, 2 ou 3, ou me diga com suas palavras como posso te ajudar. 😉"
         )
 
-    if estado == "coletando_dados" and pergunta.strip() in ["1", "2", "3"]:
-        resposta = pergunta.strip()
-        adicionar_ao_historico(lead_id, "user", resposta)
-
-        if resposta == "1":
-            return (
-                "Perfeito! Para te ajudar da melhor forma, preciso fazer uma pequena simulação. Pode ser?"
-            )
-        elif resposta == "2":
-            return (
-                "Passado é passado. Agora é bola pra frente! Para te ajudar da melhor forma, preciso fazer uma pequena simulação. Posso seguir?"
-            )
-        elif resposta == "3":
-            atualizar_estado(lead_id, "aguardando_simulacao")
-            return (
-                "Ótimo! Para agendarmos sua visita, preciso que você envie a carta de crédito ou a simulação via WhatsApp.\n"
-                "Caso não tenha em mãos, podemos fazer uma nova simulação aqui mesmo. O que prefere?"
-            )
-
     if estado == "coletando_dados":
-        idx = obter_pergunta_atual(lead_id)
+        if pergunta.strip() in ["1", "2", "3"]:
+            adicionar_ao_historico(lead_id, "user", pergunta)
+            if pergunta.strip() == "1":
+                return "Perfeito! Para te ajudar da melhor forma, preciso fazer uma pequena simulação. Pode ser?"
+            elif pergunta.strip() == "2":
+                return "Passado é passado. Agora é bola pra frente! Para te ajudar da melhor forma, preciso fazer uma pequena simulação. Posso seguir?"
+            elif pergunta.strip() == "3":
+                atualizar_estado(lead_id, "aguardando_simulacao")
+                return "Ótimo! Para agendarmos sua visita, preciso que você envie a carta de crédito ou a simulação via WhatsApp. Caso não tenha em mãos, podemos fazer uma nova simulação aqui mesmo. O que prefere?"
 
+        idx = obter_pergunta_atual(lead_id)
         if idx == 0:
             if pergunta.strip().lower() not in ["sim", "pode", "sim pode", "pode sim"]:
-                return (
-                    "Desculpa, não entendi. Posso fazer a simulação pra você? É só responder com 'sim' ou 'não', por favor."
+                mensagens = [{"role": "system", "content": "Você é Bruna, agente virtual. Responda à dúvida com clareza e retome a simulação."}]
+                mensagens.extend(obter_historico(lead_id))
+                mensagens.append({"role": "user", "content": pergunta})
+                resposta = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=mensagens,
+                    temperature=0.7
                 )
+                conteudo = resposta.choices[0].message.content.strip()
+                adicionar_ao_historico(lead_id, "user", pergunta)
+                adicionar_ao_historico(lead_id, "assistant", conteudo)
+                return conteudo + "\n\nAgora posso seguir com a simulação? É só responder 'sim'."
+
+            adicionar_ao_historico(lead_id, "user", pergunta)
             avancar_pergunta(lead_id)
             return f"digitando...\n{perguntas_simulacao[0]}"
 
@@ -84,7 +85,7 @@ def obter_resposta(pergunta, lead_id):
 
         return f"digitando...\n{pergunta_atual}"
 
-    instrucoes_sistema = """
+    instrucoes_sistema = '''
 Você é Bruna, uma agente virtual inteligente especializada em imóveis do programa Minha Casa Minha Vida. Seu papel é conduzir o atendimento de forma empática e inteligente, entendendo o contexto da conversa.
 
 REGRAS DE CONDUTA:
@@ -98,16 +99,7 @@ REGRAS DE CONDUTA:
 - Se a opção for 1 ou 2, peça confirmação para iniciar a simulação.
 - Só inicie a coleta de dados se o lead confirmar.
 - Faça uma pergunta por vez.
-
-Perguntas da simulação:
-1. Quem vai financiar o imóvel com você? (Só você, com cônjuge, ou mais alguém?)
-2. Como é a forma de trabalho da(s) pessoa(s) que irá/irão financiar? (Carteira assinada, autônomo, MEI...)
-3. Qual é a renda familiar mensal total comprovada?
-4. Vocês têm ao menos 3 anos de carteira assinada (mesmo que somando diferentes empregos)?
-5. Qual a data de nascimento da pessoa que nasceu primeiro entre vocês?
-6. Vocês têm filhos ou outras pessoas que dependem financeiramente de vocês?
-7. Têm algum valor disponível para dar de entrada? (Pode usar FGTS)
-"""
+'''
 
     mensagens = [{"role": "system", "content": instrucoes_sistema}]
     mensagens.extend(obter_historico(lead_id))
