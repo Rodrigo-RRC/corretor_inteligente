@@ -54,8 +54,13 @@ def obter_resposta(pergunta, lead_id):
 
         idx = obter_pergunta_atual(lead_id)
         if idx == 0:
-            if pergunta.strip().lower() not in ["sim", "pode", "sim pode", "pode sim"]:
-                mensagens = [{"role": "system", "content": "Você é Bruna, agente virtual. Responda à dúvida com clareza e retome a simulação."}]
+            if pergunta.strip().lower() in ["sim", "pode", "sim pode", "pode sim"]:
+                adicionar_ao_historico(lead_id, "user", pergunta)
+                avancar_pergunta(lead_id)
+                return f"digitando...\n{perguntas_simulacao[0]}"
+            else:
+                # Qualquer outra resposta será interpretada e respondida com inteligência
+                mensagens = [{"role": "system", "content": "Você é Bruna, uma agente virtual especializada em imóveis do programa Minha Casa Minha Vida. Responda com clareza à dúvida do usuário e retome a simulação com uma pergunta gentil."}]
                 mensagens.extend(obter_historico(lead_id))
                 mensagens.append({"role": "user", "content": pergunta})
                 resposta = client.chat.completions.create(
@@ -66,12 +71,9 @@ def obter_resposta(pergunta, lead_id):
                 conteudo = resposta.choices[0].message.content.strip()
                 adicionar_ao_historico(lead_id, "user", pergunta)
                 adicionar_ao_historico(lead_id, "assistant", conteudo)
-                return conteudo + "\n\nAgora posso seguir com a simulação? É só responder 'sim'."
+                return conteudo + "\n\nPosso seguir com a simulação agora? É rapidinho."
 
-            adicionar_ao_historico(lead_id, "user", pergunta)
-            avancar_pergunta(lead_id)
-            return f"digitando...\n{perguntas_simulacao[0]}"
-
+        # Perguntas de 1 a 7
         adicionar_ao_historico(lead_id, "user", pergunta)
         pergunta_atual = obter_pergunta_atual(lead_id)
         avancar_pergunta(lead_id)
