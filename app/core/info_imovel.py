@@ -1,7 +1,5 @@
 # app/core/info_imovel.py
 
-# app/core/info_imovel.py
-
 informacoes_gerais = {
     "bairro": "Bairro Novo Geisel",
     "proximidades": [
