@@ -1,164 +1,113 @@
-import os
-from dotenv import load_dotenv
-from openai import OpenAI
+from fastapi import APIRouter, Request
 from app.core.estado_lead import (
-    inicializar_lead, atualizar_estado, obter_estado,
-    adicionar_ao_historico, obter_historico,
-    obter_pergunta_atual, avancar_pergunta, perguntas_simulacao
+    estado_por_lead,
+    perguntas_simulacao,
+    inicializar_lead,
+    obter_estado,
+    avancar_pergunta
 )
-from app.core.info_imovel import informacoes_gerais
-from app.core.info_mcmv import info_mcmv
+from app.core.info_mcmv import resposta_info_mcmv
+from app.core.info_imovel import resposta_info_imovel
 
-# Carrega variáveis do .env
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=api_key)
+router = APIRouter()
 
-def gerar_resumo_info():
-    partes = []
-    partes.append(f"Imóvel localizado próximo ao bairro {informacoes_gerais['bairro']}.")
-    partes.append(f"Descrição: {informacoes_gerais['descricao']}")
-    partes.append("Proximidades: " + ", ".join(informacoes_gerais["proximidades"]))
-    partes.append(f"Programa: {info_mcmv['descricao']}")
-    partes.append("Público-alvo: " + info_mcmv["publico_alvo"])
-    partes.append("Condições de uso do FGTS: " + info_mcmv["uso_fgts"])
-    partes.append("Entrada: " + info_mcmv["entrada"])
-    partes.append("Subsídio: " + info_mcmv["subsídio"])
-    partes.append("Faixas de renda:")
-    for faixa, detalhes in info_mcmv["faixas"].items():
-        partes.append(f"  - {faixa}: {detalhes}")
-    partes.append("Documentação necessária: " + ", ".join(info_mcmv["documentacao_necessaria"]))
-    return "\n".join(partes)
+@router.post("/chat/{lead_id}")
+async def chat_bruna(lead_id: str, request: Request):
+    dados = await request.json()
+    mensagem = dados.get("mensagem", "").strip().lower()
 
-def obter_resposta(pergunta, lead_id):
-    if obter_estado(lead_id) is None:
+    if lead_id not in estado_por_lead:
         inicializar_lead(lead_id)
 
     estado = obter_estado(lead_id)
+    estado_atual = estado["estado"]
+    chat_history = estado["chat_history"]
+    pergunta_atual = estado["pergunta_atual"]
+    intencao = estado.get("intencao", None)
+    pausa_simulacao = estado.get("pausa_simulacao", False)
 
-    if estado == "aguardando_simulacao" and not pergunta.startswith("#resposta_simulacao:"):
-        return "Certo! Assim que a simulação estiver pronta, eu te aviso por aqui mesmo. 😉"
+    resposta = ""
 
-    if pergunta.startswith("#resposta_simulacao:"):
-        mensagem = pergunta.split(":", 2)[2]
-        atualizar_estado(lead_id, "respondeu_simulacao")
-        adicionar_ao_historico(lead_id, "assistant", mensagem)
-        return mensagem
+    def transicionar(novo_estado, nova_intencao=None):
+        estado["estado"] = novo_estado
+        if nova_intencao is not None:
+            estado["intencao"] = nova_intencao
 
-    if estado == "apresentacao":
-        atualizar_estado(lead_id, "escolhendo_opcao")
-        return (
-            "Olá! Sou a Bruna, sua corretora virtual — uma agente inteligente aqui pra te ajudar com imóveis do Minha Casa Minha Vida.\n\n"
-            "Este imóvel fica próximo ao Bairro Geisel, tem 1 suíte + 1 quarto, área de lazer completa, e está saindo a partir de R$ 178 mil.\n\n"
-            "digitando...\n[Foto 1 - https://link-da-imagem.com/1.jpg]\n"
-            "digitando...\n[Foto 2 - https://link-da-imagem.com/2.jpg]\n"
-            "digitando...\n[Foto 3 - https://link-da-imagem.com/3.jpg]\n\n"
-            "Agora me diga:\n"
-            "1️⃣ É a primeira vez que tenta comprar seu imóvel?\n"
-            "2️⃣ Já tentou outras vezes e não conseguiu?\n"
-            "3️⃣ Já tem carta aprovada e quer visitar o imóvel?\n\n"
-            "Responda com 1, 2 ou 3, ou me diga com suas palavras como posso te ajudar. 😉"
+    def retomar_simulacao():
+        estado["pausa_simulacao"] = False
+        estado["estado"] = "coletando_dados"
+
+    chat_history.append({"usuario": mensagem})
+
+    # 🔹 Gatilhos inteligentes fora do fluxo
+    if any(p in mensagem for p in ["mcmv", "minha casa", "subsídio", "programa"]):
+        resposta = resposta_info_mcmv()
+        estado["pausa_simulacao"] = True
+        chat_history.append({"bruna": resposta})
+        return {"resposta": resposta}
+
+    if any(p in mensagem for p in ["endereço", "localização", "bairro", "metragem", "quartos", "banheiros", "vaga", "imóvel"]):
+        resposta = resposta_info_imovel()
+        estado["pausa_simulacao"] = True
+        chat_history.append({"bruna": resposta})
+        return {"resposta": resposta}
+
+    if pausa_simulacao:
+        retomar_simulacao()
+
+    # 🔹 FSM: Atendimento fluido e empático
+    if estado_atual == "apresentacao":
+        resposta = (
+            "Olá! Que bom te ver por aqui 😊\n"
+            "Eu sou a Bruna, sua assistente no programa Minha Casa Minha Vida.\n\n"
+            "Tenho um imóvel que pode ser exatamente o que você procura:\n\n"
+            f"{resposta_info_imovel()}\n\n"
+            "📸 [Foto 1]\n📸 [Foto 2]\n📸 [Foto 3]\n\n"
+            "Agora me diga qual dessas opções melhor descreve você:\n"
+            "1️⃣ É a primeira vez que tento comprar meu imóvel próprio\n"
+            "2️⃣ Já tentei comprar e não consegui\n"
+            "3️⃣ Já tenho carta aprovada e quero visitar o imóvel"
         )
+        transicionar("esperando_resposta_opcao")
 
-    if estado == "escolhendo_opcao":
-        if pergunta.strip() == "1":
-            adicionar_ao_historico(lead_id, "user", pergunta)
-            atualizar_estado(lead_id, "esperando_confirmacao_simulacao")
-            return "Perfeito! Para te ajudar da melhor forma, preciso fazer uma pequena simulação. Pode ser?"
-
-        elif pergunta.strip() == "2":
-            adicionar_ao_historico(lead_id, "user", pergunta)
-            atualizar_estado(lead_id, "esperando_confirmacao_simulacao")
-            return "Passado é passado. Agora é bola pra frente! Para te ajudar da melhor forma, preciso fazer uma pequena simulação. Posso seguir?"
-
-        elif pergunta.strip() == "3":
-            atualizar_estado(lead_id, "aguardando_simulacao")
-            return (
-                "Ótimo! Para agendarmos sua visita, preciso que você envie a carta de crédito ou a simulação via WhatsApp.\n"
-                "Caso não tenha em mãos, podemos fazer uma nova simulação aqui mesmo. O que prefere?"
+    elif estado_atual == "esperando_resposta_opcao":
+        if "1" in mensagem:
+            resposta = "Perfeito! Para te ajudar da melhor forma, preciso fazer uma pequena simulação. Pode ser?"
+            transicionar("esperando_confirmacao_simulacao", "simulacao_opcao_1")
+        elif "2" in mensagem:
+            resposta = "Entendo… muitos clientes passaram por isso também. Vamos tentar juntos agora? Posso fazer uma simulação pra te ajudar?"
+            transicionar("esperando_confirmacao_simulacao", "simulacao_opcao_2")
+        elif "3" in mensagem:
+            resposta = (
+                "Ótimo! Pode me enviar sua carta de crédito ou simulação aprovada via WhatsApp?\n"
+                "Se não tiver, posso fazer uma simulação aqui mesmo."
             )
-
+            transicionar("esperando_confirmacao_simulacao", "verificar_documento")
         else:
-            mensagens = [{"role": "system", "content": "Você é Bruna, agente virtual. Responda à dúvida do usuário com clareza e retome perguntando se ele deseja seguir com a simulação."}]
-            mensagens.extend(obter_historico(lead_id))
-            mensagens.append({"role": "user", "content": pergunta})
-            resposta = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=mensagens,
-                temperature=0.7
-            )
-            conteudo = resposta.choices[0].message.content.strip()
-            adicionar_ao_historico(lead_id, "user", pergunta)
-            adicionar_ao_historico(lead_id, "assistant", conteudo)
-            return conteudo + "\n\nSe quiser, posso seguir com a simulação. Posso?"
+            resposta = "Não entendi sua escolha. Você pode digitar 1, 2 ou 3?"
 
-    if estado == "esperando_confirmacao_simulacao":
-        if pergunta.strip().lower() in ["sim", "pode", "sim pode", "pode sim", "claro", "sim, pode continuar"]:
-            adicionar_ao_historico(lead_id, "user", pergunta)
-            atualizar_estado(lead_id, "coletando_dados")
-            return f"digitando...\n{perguntas_simulacao[0]}"
+    elif estado_atual == "esperando_confirmacao_simulacao":
+        if any(p in mensagem for p in ["sim", "pode", "claro", "vamos", "ok"]):
+            if intencao == "verificar_documento":
+                resposta = "Tudo bem, então vou precisar fazer uma nova simulação. Vamos começar?"
+                transicionar("coletando_dados", "simulacao_nova")
+            else:
+                resposta = "Perfeito, então vamos começar nossa simulação!"
+                transicionar("coletando_dados", intencao)
         else:
-            mensagens = [{"role": "system", "content": "Você é Bruna, agente virtual. Responda com empatia à dúvida do usuário e pergunte novamente se podemos seguir com a simulação."}]
-            mensagens.extend(obter_historico(lead_id))
-            mensagens.append({"role": "user", "content": pergunta})
-            resposta = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=mensagens,
-                temperature=0.7
-            )
-            conteudo = resposta.choices[0].message.content.strip()
-            adicionar_ao_historico(lead_id, "user", pergunta)
-            adicionar_ao_historico(lead_id, "assistant", conteudo)
-            return conteudo + "\n\nPosso seguir com a simulação agora?"
+            resposta = "Se preferir, podemos conversar mais depois. É só me chamar."
 
-    if estado == "coletando_dados":
-        adicionar_ao_historico(lead_id, "user", pergunta)
-        pergunta_atual = obter_pergunta_atual(lead_id)
-        avancar_pergunta(lead_id)
+    elif estado_atual == "coletando_dados":
+        if pergunta_atual < len(perguntas_simulacao):
+            resposta = perguntas_simulacao[pergunta_atual]
+            avancar_pergunta(lead_id)
+        else:
+            resposta = "Obrigada! Agora vou processar os dados e em breve te envio a simulação!"
+            transicionar("aguardando_simulacao")
 
-        if pergunta_atual is None:
-            atualizar_estado(lead_id, "aguardando_simulacao")
-            return (
-                "Perfeito! Já coletei tudo que preciso.\n"
-                "Vou preparar a simulação com base nesses dados e te aviso por aqui mesmo, tudo bem?"
-            )
+    elif estado_atual == "aguardando_simulacao":
+        resposta = "Estou aguardando a simulação. Assim que estiver pronta, envio para você!"
 
-        return f"digitando...\n{pergunta_atual}"
-
-    instrucoes_sistema = f'''
-Você é Bruna, uma agente virtual inteligente especializada em imóveis do programa Minha Casa Minha Vida. Seu papel é conduzir o atendimento de forma empática e inteligente, entendendo o contexto da conversa.
-
-Use as informações abaixo para embasar suas respostas:
-
-{gerar_resumo_info()}
-
-REGRAS DE CONDUTA:
-- Nunca entregue o endereço do imóvel (diga apenas "próximo ao Bairro Geisel").
-- Envie três fotos do imóvel após a apresentação textual, simulando pausas como se estivesse digitando.
-- Apresente as opções iniciais:
-  1) É a primeira vez que tento comprar meu imóvel próprio
-  2) Já tentei outras vezes e não consegui
-  3) Já tenho carta aprovada e quero visitar o imóvel
-- Se a opção for 3, solicite a carta de crédito ou simulação via WhatsApp.
-- Se a opção for 1 ou 2, peça confirmação para iniciar a simulação.
-- Só inicie a coleta de dados se o lead confirmar.
-- Faça uma pergunta por vez.
-'''
-
-    mensagens = [{"role": "system", "content": instrucoes_sistema}]
-    mensagens.extend(obter_historico(lead_id))
-    mensagens.append({"role": "user", "content": pergunta})
-
-    try:
-        resposta = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=mensagens,
-            temperature=0.7
-        )
-        conteudo = resposta.choices[0].message.content.strip()
-        adicionar_ao_historico(lead_id, "user", pergunta)
-        adicionar_ao_historico(lead_id, "assistant", conteudo)
-        return conteudo
-    except Exception as e:
-        return f"Erro ao gerar resposta: {str(e)}"
+    chat_history.append({"bruna": resposta})
+    return {"resposta": resposta}
 

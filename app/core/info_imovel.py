@@ -1,3 +1,4 @@
+
 # app/core/info_imovel.py
 
 informacoes_gerais = {
@@ -17,4 +18,18 @@ informacoes_gerais = {
         "mensagem_digitando": True
     }
 }
+
+
+def resposta_info_imovel():
+    texto = (
+        f"📍 Localização: {informacoes_gerais['bairro']}\n\n"
+        f"🛏️ Descrição: {informacoes_gerais['descricao']}\n\n"
+        "🗺️ Nas proximidades:\n" +
+        "\n".join([f"- {p}" for p in informacoes_gerais["proximidades"]])
+    )
+
+    if not informacoes_gerais["regras"]["mostrar_valor_apenas_apos_simulacao"]:
+        texto += f"\n\n💰 Valor: {informacoes_gerais['valor']}"
+
+    return texto
 

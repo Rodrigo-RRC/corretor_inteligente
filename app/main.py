@@ -1,8 +1,9 @@
 # app/main.py
 
 from fastapi import FastAPI
-from app.routes.perguntas import router as pergunta_router
+from app.services import chat  # <- caminho correto
 
 app = FastAPI()
 
-app.include_router(pergunta_router, prefix="")
+app.include_router(chat.router, prefix="")
+

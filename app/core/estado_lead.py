@@ -14,11 +14,12 @@ def inicializar_lead(lead_id):
     estado_por_lead[lead_id] = {
         "estado": "apresentacao",
         "chat_history": [],
-        "pergunta_atual": 0
+        "pergunta_atual": 0,
+        "intencao": None
     }
 
 def obter_estado(lead_id):
-    return estado_por_lead.get(lead_id, {}).get("estado")
+    return estado_por_lead.get(lead_id)
 
 def atualizar_estado(lead_id, novo_estado):
     if lead_id in estado_por_lead:

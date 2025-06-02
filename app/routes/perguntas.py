@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from app.services.chat import obter_resposta
 
 router = APIRouter()
 
